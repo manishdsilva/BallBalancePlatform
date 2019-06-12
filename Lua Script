@@ -1,0 +1,51 @@
+
+function sysCall_init()
+ 
+  
+    arm1 = sim.getObjectHandle('Servo1_rotor')
+    arm2 = sim.getObjectHandle('Servo2_rotor')
+    arm3 = sim.getObjectHandle('Servo3_rotor')
+    arm4 = sim.getObjectHandle('Servo4_rotor') 
+    pf = sim.getObjectHandle('Platform') 
+    sphere = sim.getObjectHandle('Sphere')
+    target = sim.getObjectHandle('target')
+    
+    Kp = 1          -- 1
+    Kd = -100        -- -35
+    Ki = 0.5        -- 0.5
+
+    prev_x = 0
+    prev_y = 0
+
+    int_x = 0
+    int_y = 0
+
+    
+end
+function sysCall_actuation()   
+ 
+        xyz_cor = sim.getObjectPosition(sphere,pf)
+        xyz_tar = sim.getObjectPosition(target,pf)
+
+        x_cor = ((xyz_cor[1]-xyz_tar[1])*100) 
+        y_cor = ((xyz_cor[2]-xyz_tar[2])*100) 
+               
+        angle_x = math.floor(Kp*(x_cor) + Kd*(prev_x-(x_cor)) + Ki*(x_cor + int_x))*math.pi/(180)
+        angle_y = -math.floor(Kp*(y_cor) + Kd*(prev_y-(y_cor))+ Ki*(y_cor + int_y))*math.pi/(180)
+
+       
+        sim.setJointTargetPosition(arm1,-angle_x)
+        sim.setJointTargetPosition(arm4,angle_x)
+       
+        sim.setJointTargetPosition(arm2,angle_y)
+        sim.setJointTargetPosition(arm3,angle_y)
+        
+        int_x = x_cor
+        int_y = y_cor
+
+        prev_x = x_cor
+        prev_y = y_cor
+
+   
+         
+end
